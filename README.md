@@ -17,4 +17,11 @@
 - 旋转中心
 - 探测器单元之间距离
 - X射线的180个方向
-$ E = m * c^2 $
+```c
+#include <stdio.h>
+
+int main(void)
+{
+  printf("Hello, wolrd\n");
+}
+```
