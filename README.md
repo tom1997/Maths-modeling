@@ -1,4 +1,6 @@
-# 国赛A题
+
+
+%# 国赛A题
 
 背景：
 - 二维CT成像
@@ -25,3 +27,9 @@ int main(void)
   printf("Hello, wolrd\n");
 }
 ```
+
+$$\varphi = m\Delta$$
+$$\frac{1+ M\times \ell}{2} + y\sin{(\theta-\varphi)} + x\cos{(\theta-\varphi)}=(n+\lambda)\times \ell$$
+$$\tilde P(n,m) = P(n,m)\times h(n)$$
+$$ \tilde P(n+\delta,m) = (1-\delta)P(n,m)+\delta P(n+1, m)$$
+$$ a_m(i,j) = a_{m-1}(i,j)+\tilde P(n+\delta, m)$$
