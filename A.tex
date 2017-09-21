@@ -79,11 +79,9 @@ $ (x_0,y_0)$	    & 旋转中心坐标  \\ \hline
 
 首先确定每个探测器单元之间的距离，再建立一个坐标系确定圆与射线的相对关系，根据题目所给的吸收率，求出衰减系数。以椭圆圆心建立坐标系，知吸收率与每一条X射线穿过的介质厚度是呈线性关系的，利用线性关系，即可求出每次旋转的角度。其后利用几何关系法，考虑到探测器单元的距离差，就可以求出旋转中心。其平均值就是旋转中心的坐标。
 \subsection{问题二分析}
-Radon变换：一个平面内沿不同的直线对f（x，y）做线积分，得到的像F(d,α)就是函数f的Radon变换。平面（d，α）的每个点的像函数值对应了原始函数的某个线积分值。
+我们从问题一中所得到的数据能应用在问题二上，我们将尝试使用Iradon函数进行反投影，而后对其进行评估，重新拟定坐标轴，用旋转角度与坐标变换的办法，求解出模型。
 \subsection{问题三分析}
 在第二问中我们建立了一个滤波反投影的数学模型，并相应的用Matlab进行实现。运用该模型给出附件五反投影的图像已经十个点的吸收率。
-
-\subsection{问题四分析}
 
 \section{模型求解}
 \subsection{问题一分析}
@@ -158,7 +156,6 @@ r^2=(15\cos{\theta})^2+(40\sin{ \theta})^2
 PQ=\frac{2 \times 15\times 40\sqrt{r^2-d+kl{\ell}^2}}{r^2}
 \end{equation}
 
-知旋转中心的特征为：在图中，在第256和257之间的检测器必然穿过去
 \subsubsection {模型的解决}
 通过(1)的公式，再计算出平均数值，得出
 $$\ell \approx 0.2775  mm$$
@@ -171,14 +168,18 @@ $$\ell \approx 0.2775  mm$$
 再利用(6),(8),(9)求出每次转动的角度。
 求得
 \begin{displaymath}
-\theta_i-\theta_{i-1} \approx 1.0003°，i=2,\dots,179
+\theta_i-\theta_{i-1} \approx 1.0003°,i=2,\dots,179
 \end{displaymath}
 这个结果符合了每一次实验转动180度求解的必要条件，视为可接受的误差值。
 
-\section{问题二的分析}
+\subsection{问题二的分析}
 \subsubsection {模型的建立}
-对于问题二，本题附件三中给出了不同角度下，各个探测器的接收情况，通过这些数据我们需要求解出新的介质的位置，几何形状以及各点吸收率的情况。我们选择用matlab自带的iradon函数将其求出，将利用问题一所求出的数据进行反投影建模。在Matlab里成功实现。
+对于问题二，本题附件三中给出了不同角度下，各个探测器的接收情况，通过这些数据我们需要求解出新的介质的位置，几何形状以及各点吸收率的情况。我们选择用matlab自带的iradon函数将其求出，将利用问题一所求出的数据进行反投影建模。在Matlab里成功实现。但是用matlab进行的Iradon函数表现出来的图是相差了一个角度，需要进行角度与位置调整。
 \subsubsection {模型的解决}
+我们一开始
+因此我们在把图旋转平移到原坐标上（以正方形托盘O为原点）
+最后按比例缩放求解出模型原解。
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=.6\textwidth]{7.jpg}
@@ -195,20 +196,38 @@ p    &   0    &  0      &  0.4918   &  0.4814   &  0.4858   &  0.0310   &  0.008
 \end{center}
 
 
-\section{问题三的分析}
+\subsection{问题三的分析}
 \subsubsection {模型的建立}
 对于问题三，与问题二有些许相似，于是采用同样方法求解，但求出的图像不像第二问样规则，是极其不规则的图形，修正后也无法辨别10个点的吸收率。于是在修正后，为了精确求得10个点的吸收率，我们选择采用滤波反投影重建算法而不直接调用iradon函数来求解。
 因为反投影算法会产生星状伪迹，重建后的图像边缘模糊不清，因此调用滤波函数来尽可能消除星状伪迹的影响。
-
+因此我们选择使用卷积反投影法去构建二维图。
 \begin{figure}[H]
 \centering
 \includegraphics[width=.6\textwidth]{5.png}
 \caption{卷积反投影}
 \end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=.6\textwidth]{4.png}
+\end{figure}
+以旋转中心为原点构建坐标可转化为（r， θ）极坐标形式，假设光线与y轴夹 $\phi$角，并建立另一旋转坐标系
+其次构建NxN的像素点（设单位为1），设第i，j个像素点，坐标为（i，j），设旋转中心在这个坐标下为（x0，y0）
+定义m为转过角度的次数
+几何关系易知
+$$r\cos(\theta-\varphi )+\frac{M+1}{2l}=(i-x_0)\cos(\theta-\varphi )+(j-y_0)sin(\theta-\varphi)+\frac{M+1}{2l}=(n+\delta)l $$（其中l为探测单位间的距离，n为整数，M为总的探测器数量，δ为小数部分），通过几何关系，可以知道经过这个点的射线是第n号发射器发射的，强度为P(n,m)，定义滤波函数为h(n).
+5定义am（i，j）为当转角次数为m时的累吸收强度值。
+则推出以下公式:
+$$\varphi = m\Delta$$
+$$\frac{1+ M\times \ell}{2} + y\sin{(\theta-\varphi)} + x\cos{(\theta-\varphi)}=(n+\lambda)\times \ell$$
+$$\tilde P(n,m) = P(n,m)\times h(n)$$
+$$ \tilde P(n+\delta,m) = (1-\delta)P(n,m)+\delta P(n+1, m)$$
+$$ a_m(i,j) = a_{m-1}(i,j)+\tilde P(n+\delta, m)$$
+从以上五条公式中能把每一像素点的灰度标出来，然后输入进matlab求解，就得到二维图。
 \subsubsection {模型的解决}
 \begin{figure}[H]
 \centering
 \includegraphics[width=.6\textwidth]{8.jpg}
+
 
 
 以上为问题三的二维图。
@@ -222,10 +241,15 @@ p    &   2.0741   &  0.4251      &0.9073   &  0.4814   & 0.4090   & 0.0237 & 3.2
 \end{tabular}
 \end{center}
 \end{figure}
-\section{问题四的分析}
+\subsection{问题四的分析}
+
 \subsubsection {模型的解决}
-造成这题中的误差来源于星状伪迹，也就是吸收率p存在误差，而p的误差delta p来源于
+造成这题中的误差来源于星状伪迹，也就是吸收率存在误差，而P的误差$\delta P$来源于
 光线的入射角度a，物体所在位置的距离r（相对原点）和角度b【极坐标下的情况】，而p的误差会造成线积分时p（x，y）的偏差，从而对最后的结果产生影响。
+可以用公式表达其误差：
+\begin{equation}
+\int_{line}{\rho}\mathrm{d}l={\rho}PQ
+\end{equation}
 为了深一步了解其误差含义，我们调用IRadon函数来对问题一的模型进行反投影建模。再与原本的数据给出的图进行对比。
 \begin{figure}[H]
 \centering
